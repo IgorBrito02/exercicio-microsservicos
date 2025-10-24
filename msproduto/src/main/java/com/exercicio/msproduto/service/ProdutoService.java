@@ -1,23 +1,16 @@
 package com.exercicio.msproduto.service;
 
-import com.exercicio.msproduto.model.Produto;
-import com.exercicio.msproduto.repository.ProdutoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-@Service
-public class ProdutoService {
-    @Autowired
-    private ProdutoRepository repository;
+import com.exercicio.msproduto.dto.ProdutoDto;
 
-    public List<Produto> listar() { return repository.findAll(); }
-    public Produto salvar(Produto p) { return repository.save(p); }
-    public Produto atualizar(Long id, Produto p) {
-        Produto existente = repository.findById(id).orElseThrow();
-        existente.setNome(p.getNome());
-        existente.setPreco(p.getPreco());
-        return repository.save(existente);
-    }
-    public void deletar(Long id) { repository.deleteById(id); }
+public interface ProdutoService {
+
+  Page<ProdutoDto> findAll(Pageable pagination);
+  ProdutoDto findById(Long id);
+  ProdutoDto save(ProdutoDto produtoDto);
+  ProdutoDto update(Long id, ProdutoDto produtoDto);
+  void delete(Long id);
+
 }
