@@ -1,0 +1,12 @@
+CREATE TABLE tb_pedidos (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  data_pedido DATETIME NOT NULL,
+  status ENUM('CRIADO', 'CONFIRMADO', 'CANCELADO') NOT NULL
+);
+
+CREATE TABLE tb_pedido_produtos (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  pedido_id BIGINT NOT NULL,
+  produto_id BIGINT NOT NULL,
+  FOREIGN KEY (pedido_id) REFERENCES tb_pedidos(id)
+);
