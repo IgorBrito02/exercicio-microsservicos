@@ -1,16 +1,28 @@
 package com.exercicio.mspedido.model;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.exercicio.mspedido.dto.PedidoDto;
 import com.exercicio.mspedido.enums.StatusPedidoEnum;
+
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
@@ -23,10 +35,12 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "data_pedido", nullable = false)
+    @CreationTimestamp
     private LocalDateTime dataPedido;
 
     @Enumerated(EnumType.STRING)
-    private StatusPedidoEnum status;
+    private StatusPedidoEnum status = StatusPedidoEnum.CRIADO;
 
     @ElementCollection
     @CollectionTable(name = "tb_pedido_produtos", joinColumns = @JoinColumn(name = "pedido_id"))
@@ -34,6 +48,9 @@ public class Pedido {
     private List<Long> idProdutos = new ArrayList<>();
 
     public static Pedido fromDto(PedidoDto pedidoDto){
-        return new Pedido(pedidoDto.id(), pedidoDto.dataPedido(), pedidoDto.status(), pedidoDto.idProdutos());
+        Pedido pedido = new Pedido();
+        pedido.setIdProdutos(pedidoDto.idProdutos());
+
+        return pedido;
     }
 }

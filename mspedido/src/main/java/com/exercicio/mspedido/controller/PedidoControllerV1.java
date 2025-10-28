@@ -1,6 +1,7 @@
 package com.exercicio.mspedido.controller;
 
 import com.exercicio.mspedido.dto.PedidoDto;
+import com.exercicio.mspedido.enums.StatusPedidoEnum;
 import com.exercicio.mspedido.service.PedidoService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -63,6 +64,15 @@ public class PedidoControllerV1 {
     ){
         var dtoUpdated = service.update(id, dto);
         return ResponseEntity.ok(dtoUpdated);
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<Void> atualizaStatus(
+        @PathVariable Long id,
+        @RequestParam StatusPedidoEnum status
+    ) {
+        service.atualizaStatus(id, status);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")

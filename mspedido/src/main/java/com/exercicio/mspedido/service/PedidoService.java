@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.exercicio.mspedido.dto.PedidoDto;
+import com.exercicio.mspedido.enums.StatusPedidoEnum;
 
 public interface PedidoService {
 
@@ -12,5 +13,6 @@ public interface PedidoService {
   PedidoDto save(PedidoDto pedidoDto);
   PedidoDto update(Long id, PedidoDto pedidoDto);
   void delete(Long id);
+  void atualizaStatus(Long id, StatusPedidoEnum status);
   
 }

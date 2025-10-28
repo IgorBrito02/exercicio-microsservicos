@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.exercicio.mspedido.dto.PedidoDto;
+import com.exercicio.mspedido.enums.StatusPedidoEnum;
 import com.exercicio.mspedido.model.Pedido;
 import com.exercicio.mspedido.repository.PedidoRepository;
 
@@ -54,6 +55,16 @@ public class PedidoServiceImpl implements PedidoService {
             .findById(id)
             .orElseThrow(()->new EntityNotFoundException("Pedido não Encontrado"));
         repository.deleteById(id);
+    }
+
+    @Transactional
+    @Override
+    public void atualizaStatus(Long id, StatusPedidoEnum status) {
+        Pedido pedido = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado"));
+        
+        pedido.setStatus(status);
+        repository.save(pedido);
     }
 
     
