@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: mspagamento
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mspagamento-db?createDatabaseIfNotExist=true
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
+server:
+  port: 0
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    hostname: localhost
+    instance-id: ${spring.application.name}:${random.value}
+
+mq:
+  queues:
+    pagamento: queue_pagamentos
