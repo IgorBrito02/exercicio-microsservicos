@@ -1,15 +1,15 @@
 package com.exercicio.mspedido.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
-
-import java.time.LocalDateTime;
+import lombok.NoArgsConstructor;
 
 @Data
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class ResponseErrorDto {
-    private final String message;
+    private String message;
     private String error;
-    private final String status;
-    private LocalDateTime data = LocalDateTime.now();
+    private int status;
+    private Object data;
 }

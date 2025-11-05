@@ -4,24 +4,26 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/mspagamento-db?createDatabaseIfNotExist=true
-    username: ${MYSQL_USERNAME}
-    password: ${MYSQL_PASSWORD}
+    url: jdbc:mysql://localhost:3306/mspagamento-db?createDatabaseIfNotExist=true&serverTimezone=UTC
+    username: root
+    password: senharoot
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
 
   rabbitmq:
     host: localhost
     port: 5672
-    username: ${RABBITMQ_USERNAME}
-    password: ${RABBITMQ_PASSWORD}
+    username: guest
+    password: guest
+    queue:
+      pagamentos: queue_pagamentos
 
 server:
-  port: 0
+  port: 8080
 
 eureka:
   client:
@@ -30,7 +32,3 @@ eureka:
   instance:
     hostname: localhost
     instance-id: ${spring.application.name}:${random.value}
-
-mq:
-  queues:
-    pagamento: queue_pagamentos

@@ -2,22 +2,30 @@ package com.exercicio.mspagamento.controller;
 
 import com.exercicio.mspagamento.dto.PagamentoDto;
 import com.exercicio.mspagamento.service.PagamentoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.math.BigDecimal;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/pagamentos")
-@RequiredArgsConstructor
 public class PagamentoController {
 
     private final PagamentoService service;
 
     @PostMapping
     public ResponseEntity<PagamentoDto> registrarPagamento(
-            @RequestParam Long pedidoId,
-            @RequestParam BigDecimal valor) {
-        return ResponseEntity.ok(service.registrarPagamento(pedidoId, valor));
+        @Valid @RequestBody PagamentoDto dto
+    ) {
+        PagamentoDto saved = service.registrarPagamento(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PagamentoDto> buscarPorId(@PathVariable Long id) {
+        PagamentoDto dto = service.buscarPorId(id);
+        return ResponseEntity.ok(dto);
     }
 }

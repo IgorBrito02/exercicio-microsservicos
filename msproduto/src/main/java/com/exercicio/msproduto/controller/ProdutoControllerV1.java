@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/produtos")
@@ -23,55 +25,47 @@ public class ProdutoControllerV1 {
 
     @GetMapping
     public ResponseEntity<Page<ProdutoDto>> findAll(
-        @PageableDefault(size = 5)
-        Pageable pagination
-    ){
+        @PageableDefault(size = 5) Pageable pagination
+    ) {
         return ResponseEntity.ok(service.findAll(pagination));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProdutoDto> findById(
-        @PathVariable("id")
-        Long id
-    ){
-        try{
+    public ResponseEntity<ProdutoDto> findById(@PathVariable Long id) {
+        try {
             return ResponseEntity.ok(service.findById(id));
-        }catch (EntityNotFoundException e){
+        } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @PostMapping
-    public ResponseEntity<ProdutoDto> save(
-        @Valid
-        @RequestBody
-        ProdutoDto dto
-    ){
+    public ResponseEntity<ProdutoDto> save(@Valid @RequestBody ProdutoDto dto) {
         var dtoSaved = service.save(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(dtoSaved);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ProdutoDto> update(
-        @PathVariable("id")
-        Long id,
-        
-        @Valid
-        @RequestBody
-        ProdutoDto dto
-    ){
+        @PathVariable Long id,
+        @Valid @RequestBody ProdutoDto dto
+    ) {
         var dtoUpdated = service.update(id, dto);
         return ResponseEntity.ok(dtoUpdated);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(
-        @PathVariable
-        Long id
-    ){
-        service.delete(id);
+    /**
+     * Endpoint chamado pelo mspedido para realizar a baixa no estoque após o pagamento ser CONFIRMADO.
+     */
+    @PutMapping("/baixaEstoque")
+    public ResponseEntity<Void> baixaEstoque(@RequestBody List<Long> produtoIds) {
+        service.realizaBaixaEstoque(produtoIds);
         return ResponseEntity.noContent().build();
     }
 
-
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }
