@@ -45,15 +45,15 @@ Este projeto corresponde à **Segunda Entrega** do exercício da disciplina **Mi
 
 ## 💡 Funcionalidades Implementadas
 
-✅ Registro de pagamentos via API REST
-✅ Processamento assíncrono de mensagens de pagamento via RabbitMQ
-✅ Atualização automática do status do pedido após confirmação do pagamento
-✅ Criação automática do pagamento com status `CONFIRMADO` e expiração de 24h
-✅ Integração completa entre os microsserviços (Pedidos, Produtos e Pagamentos)
-✅ Estrutura organizada em camadas: `controller`, `service`, `repository`, `dto`, `model` e `infra.mqueue`
-✅ Banco de dados criado via Flyway (`tb_pagamentos`)
-✅ Registro no Eureka Server
-✅ Testes de execução bem-sucedidos em todos os microsserviços
+- ✅ Registro de pagamentos via API REST
+- ✅ Processamento assíncrono de mensagens de pagamento via RabbitMQ
+- ✅ Atualização automática do status do pedido após confirmação do pagamento
+- ✅ Criação automática do pagamento com status `CONFIRMADO` e expiração de 24h
+- ✅ Integração completa entre os microsserviços (Pedidos, Produtos e Pagamentos)
+- ✅ Estrutura organizada em camadas: `controller`, `service`, `repository`, `dto`, `model` e `infra.mqueue`
+- ✅ Banco de dados criado via Flyway (`tb_pagamentos`)
+- ✅ Registro no Eureka Server
+- ✅ Testes de execução bem-sucedidos em todos os microsserviços
 
 ---
 
@@ -94,6 +94,118 @@ Usuário: `guest` | Senha: `guest`
 - **Criar Pedido** → `POST http://localhost:8082/pedidos`
 - **Pagamento (assíncrono)** é processado via RabbitMQ e salvo no `mspagamento`
 - **Consultar Pagamento** → `GET http://localhost:8083/pagamentos/{id}`
+
+---
+
+## 🧪 SEQUÊNCIA DE TESTES – RESULTADOS REAIS (2025-11-05)
+
+Todos os testes abaixo foram executados com sucesso via Postman e RabbitMQ Management Plugin, comprovando o funcionamento completo da integração entre os microsserviços.
+
+---
+
+### 🔹 PASSO 1 — Criar Produto
+
+**Endpoint:** `POST http://localhost:8081/produtos`
+**JSON enviado:**
+```json
+{
+  "nome": "Headset Gamer Surround 7.1",
+  "quantidade": 5,
+  "descricao": "Com microfone e iluminação RGB",
+  "preco": 480.0
+}
+```
+✅ **Retornou (201 Created):**
+```json
+{
+  "id": 2,
+  "nome": "Headset Gamer Surround 7.1",
+  "quantidade": 5,
+  "descricao": "Com microfone e iluminação RGB",
+  "preco": 480.0
+}
+```
+
+---
+
+### 🔹 PASSO 2 — Criar Pedido
+
+**Endpoint:** `POST http://localhost:8082/pedidos`
+```json
+{
+  "dataPedido": "2025-11-05T21:00:00",
+  "status": "CRIADO",
+  "idProdutos": [2]
+}
+```
+✅ **Retornou (201 Created):**
+```json
+{
+  "id": 4,
+  "dataPedido": "2025-11-05T21:00:00",
+  "status": "CRIADO",
+  "idProdutos": [2]
+}
+```
+
+---
+
+### 🔹 PASSO 3 — Enviar Mensagem de Pagamento (RabbitMQ)
+
+**Fila:** `queue_pagamentos`
+**Mensagem (JSON):**
+```json
+{
+  "pedidoId": 4,
+  "valor": 480.0
+}
+```
+**Como enviar:**
+**1.** Acesse [http://localhost:15672](http://localhost:15672) (login `guest` / senha `guest`)
+**2.** Vá em **Queues → queue_pagamentos → Publish message**
+**3.** Cole o JSON acima e clique em **Publish Message**
+
+---
+
+### 🔹 PASSO 4 — Consultar Pagamentos no MySQL
+
+No MySQL Workbench, com o banco `mspagamento-db` selecionado como Default Schema, execute a query:
+
+```sql
+SELECT * FROM tb_pagamentos;
+```
+✅ **Retornou:**
+
+| id | codigo | data_criacao | data_expiracao | pedido_id | status | valor |
+|----|---------|---------------|----------------|------------|---------|--------|
+| 2 | ... | 2025-11-05<br>12:43:37.081673 | 2025-11-06<br>12:43:37.081673 | 4 | **CONFIRMADO** | 480.00 |
+
+---
+
+### 🔹 PASSO 5 — Buscar Pagamento pelo ID
+
+**Endpoint:** `GET http://localhost:8083/pagamentos/2`
+✅ **Retornou (200 OK):**
+```json
+{
+  "id": 2,
+  "codigo": "00c05148-d011-4b18-a4b1-4e769e6b7e6a",
+  "pedidoId": 4,
+  "valor": 480.00,
+  "status": "CONFIRMADO",
+  "dataCriacao": "2025-11-05T09:43:37.081673",
+  "dataExpiracao": "2025-11-06T09:43:37.081673"
+}
+```
+
+---
+
+✅ **Todos os fluxos foram executados com sucesso, comprovando:**
+
+- Comunicação **síncrona** entre Pedidos e Produtos
+- Comunicação **assíncrona** via RabbitMQ com o msPagamentos
+- Persistência correta no banco **MySQL**
+- Sincronização entre serviços registrada no **Eureka Server**
 
 ---
 
